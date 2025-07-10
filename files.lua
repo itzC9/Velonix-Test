@@ -12,7 +12,7 @@ local playerGui = LocalPlayer:WaitForChild("PlayerGui")
 local GameEvents = ReplicatedStorage:WaitForChild("GameEvents")
 local buySeedEvent = GameEvents:WaitForChild("BuySeedStock")
 local plantSeedEvent = GameEvents:WaitForChild("Plant_RE")
-
+local Sell = GameEvents:WaitForChild("Sell_Inventory")
 local settings = {
 	auto_buy_seeds = false,
 	use_distance_check = false,
@@ -36,6 +36,13 @@ local function get_player_farm()
 		end
 	end
 	return nil
+end
+
+local function sell_fruit()
+	game:GetService("ReplicatedStorage")
+		:WaitForChild("GameEvents")
+		:WaitForChild("Sell_Inventory")
+		:FireServer()
 end
 
 local function buy_seed(seed_name)
