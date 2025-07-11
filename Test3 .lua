@@ -1,17 +1,19 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/itzC9/Velonix-UI-Library/refs/heads/main/Main3.lua"))()
 
-local LocalPlayer = game:GetService("Players").LocalPlayer
-local UserInputService = game:GetService("UserInputService")
-
-local dashActive = false
-local dashConnection
-
-local comboActive = false
-local comboConnection
-
 local espRunning = false
 local espObjects = {}
 local connections = {}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local assistConnection = nil
+
+local fovEnabled = false
+local fovSize = 100
+local fovCircle = nil
 
 function createESP()
 	if espRunning then return end
@@ -136,16 +138,14 @@ end
 function removeESP()
 	if not espRunning then return end
 	espRunning = false
-
-	-- Disconnect all connections
+	
 	for _, conn in ipairs(connections) do
 		if conn and conn.Disconnect then
 			pcall(function() conn:Disconnect() end)
 		end
 	end
 	table.clear(connections)
-
-	-- Remove all drawing objects
+    
 	for _, esp in pairs(espObjects) do
 		for _, v in pairs(esp) do
 			if v and v.Remove then
@@ -156,47 +156,80 @@ function removeESP()
 	table.clear(espObjects)
 end
 
-function AutoComboOFF()
-    comboActive = true
-    comboConnection = game:GetService("RunService").Heartbeat:Connect(function()
+function getClosestTarget()
+    local closest = nil
+    local minDist = math.huge
+    local mousePos = UserInputService:GetMouseLocation()
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = player.Character.HumanoidRootPart
+            local screenPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+
+            if onScreen then
+                local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+                if fovEnabled then
+                    if dist <= fovSize and dist < minDist then
+                        minDist = dist
+                        closest = hrp
+                    end
+                else
+                    if dist < minDist then
+                        minDist = dist
+                        closest = hrp
+                    end
+                end
+            end
+        end
+    end
+
+    return closest
+end
+
+function AssistOn()
+    if assistConnection then return end
+
+    assistConnection = RunService.RenderStepped:Connect(function()
         local target = getClosestTarget()
-        if target and comboActive then
-            local distance = (target.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-            if distance <= 15 then
-                mouse1press()
-                wait(0.1)
-                mouse1release()
-            end
+        if target then
+            local direction = (target.Position - Camera.CFrame.Position).Unit
+            local newCF = CFrame.new(Camera.CFrame.Position, Camera.CFrame.Position + direction)
+            Camera.CFrame = newCF
         end
     end)
 end
 
-function AutoComboOFF()
-    comboActive = false
-    if comboConnection then comboConnection:Disconnect() end
+function AssistOff()
+    if assistConnection then
+        assistConnection:Disconnect()
+        assistConnection = nil
+    end
 end
 
-function antideathON()
-    dashActive = true
-    dashConnection = game:GetService("RunService").Heartbeat:Connect(function()
-        local char = LocalPlayer.Character
-        local humanoid = char and char:FindFirstChildWhichIsA("Humanoid")
+function fovON()
+    fovEnabled = true
+    if fovCircle then return end
 
-        if humanoid and humanoid.Health > 0 then
-            local percent = humanoid.Health / humanoid.MaxHealth
-            if percent <= 0.2 then
-                -- Dash Key: Q
-                keypress(Enum.KeyCode.Q)
-                wait(0.1)
-                keyrelease(Enum.KeyCode.Q)
-            end
-        end
+    fovCircle = Drawing.new("Circle")
+    fovCircle.Radius = fovSize
+    fovCircle.Thickness = 2
+    fovCircle.Filled = false
+    fovCircle.Visible = true
+    fovCircle.Color = Color3.fromRGB(255, 255, 255)
+
+    RunService:BindToRenderStep("FOVFollow", Enum.RenderPriority.Camera.Value + 1, function()
+        fovCircle.Position = UserInputService:GetMouseLocation()
     end)
 end
 
-function antideathOFF()
-    dashActive = false
-    if dashConnection then dashConnection:Disconnect() end
+function fovOFF()
+    fovEnabled = false
+    if fovCircle then
+        fovCircle:Remove()
+        fovCircle = nil
+    end
+    RunService:UnbindFromRenderStep("FOVFollow")
 end
 
 createWindow("Velonix-Universal", 28)
@@ -204,28 +237,41 @@ addLogo(12345678)
 
 createTab("Home", 1)
 createLabel("Credits:", "Founder: itzC9\nScripter: GoodgamerYT", 1)
-
+createButton("Unknown Button", 1, function()
+    print("Button Clicked!")
+end)
 createTab("Player", 2)
-createToggle("Auto-Combo", 2, false, function(s)
+createToggle("Aimbot", 2, false, function(s)
     if s then
-        AutoCombo()
+        AssistOn()
     else
-        AutoComboOFF()
+        AssistOff()
     end
 end)
-createToggle("Anti-Death", 2, false, function(s)
-    if s then
-        antideathON()
-    else
-        antideathOFF()
-    end
-end)
-createTab("Visual", 3)
+createTab("Visuals", 3)
 createToggle("ESP", 3, false, function(s)
     if s then
         createESP()
     else
         removeESP()
+    end
+end)
+createTab("Other", 4)
+createToggle("FOV", 4, false, function(s)
+    if s then
+        fovON()
+    else
+        fovOFF()
+    end
+end)
+
+createTextBox(4, "FOV Size", function(text)
+    local num = tonumber(text)
+    if num then
+        fovSize = num
+        if fovCircle then
+            fovCircle.Radius = fovSize
+        end
     end
 end)
 
