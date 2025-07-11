@@ -230,7 +230,8 @@ createWindow("Velonix-TSB", 28)
 addLogo(121332021347640)
 
 createTab("Home", 1)
-createLabel("Credits:", "Founder: itzC9\nScripter: GoodgamerYT", 1)
+createLabel("Credits:", "Founder: itzC9", 1)
+createLabel("Scripter: GoodgamerYT", 1)
 
 createTab("Player", 2)
 createToggle("Auto-Combo", 2, false, function(s)

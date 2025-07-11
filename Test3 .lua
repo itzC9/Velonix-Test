@@ -1,5 +1,3 @@
--- Velonix Universal Script
-
 loadstring(game:HttpGet("https://raw.githubusercontent.com/itzC9/Velonix-UI-Library/refs/heads/main/Main3.lua"))()
 
 local Players = game:GetService("Players")
