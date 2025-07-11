@@ -95,12 +95,12 @@ end
 
 -- Buttons with script load
 createButton("🌱 Grow a Garden", function()
-	loadstring(game:HttpGet("https://github.com/itzC9/Velonix-Test/raw/refs/heads/main/Test1.lua"))()
+	loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Test1.lua"))()
 	screenGui:Destroy()
 end)
 
 createButton("⚔️ The Strongest Battleground", function()
-	loadstring(game:HttpGet("https://github.com/itzC9/Velonix-Test/raw/refs/heads/main/Test2.lua"))()
+	loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Test2.lua"))()
 	screenGui:Destroy()
 end)
 
@@ -110,7 +110,7 @@ createButton("🧠 Steal a Brainrot (Coming Soon)", function()
 end)
 
 createButton("🌐 Universal Script", function()
-	loadstring(game:HttpGet("https://github.com/itzC9/Velonix-Test/raw/refs/heads/main/Test3.lua"))()
+	loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Test3.lua"))()
 	screenGui:Destroy()
 end)
 
