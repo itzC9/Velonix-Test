@@ -233,17 +233,6 @@ createToggle("Auto-Buy " .. seed, 2, false, function(s)
     end
 end)
 
-createTextBox(2, "Seed Name: " .. seed, function(t)
-        if t and t ~= "" then
-            customSeedNames[seed] = t
-            if autoBuyStates[seed] then
-                ReplicatedStorage.GameEvents.BuySeedStock:FireServer(t)
-                createNotify("Auto-Buy:", "Now buying: " .. t)
-            end
-        end
-    end)
-end
-
 -- Settings
 createSettingButton("Rejoin", function()
 	TeleportService:TeleportToPlaceInstance(PLACE_ID, CURRENT_JOB, LocalPlayer)
