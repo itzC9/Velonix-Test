@@ -14,7 +14,6 @@ local playerGui = LocalPlayer:WaitForChild("PlayerGui")
 local GameEvents = ReplicatedStorage:WaitForChild("GameEvents")
 local buySeedEvent = GameEvents:WaitForChild("BuySeedStock")
 local plantSeedEvent = GameEvents:WaitForChild("Plant_RE")
-local Sell = GameEvents:WaitForChild("Sell_Inventory")
 local settings = {
 	auto_buy_seeds = false,
 	use_distance_check = false,
@@ -38,10 +37,6 @@ local function get_player_farm()
 		end
 	end
 	return nil
-end
-
-local function sell_fruit()
-	Sell:FireServer(Sell_Inventory)
 end
 
 local function buy_seed(seed_name)
@@ -187,7 +182,7 @@ else
 	createNotify("Plot Error", "Farm or Plant_Locations missing.")
 end
 
-createWindow("Velonix Hub", 28)
+createWindow("Velonix-GaG", 28)
 addLogo(121332021347640)
 
 createTab("Home", 1)
@@ -202,11 +197,9 @@ createToggle("Auto Collect", 1, false, function(s)
         end
 end)
 createDivider(1)
-createToggle("Auto Plant", 1, false, function(s)
-    is_auto_planting = s
-    if s then
-        task.spawn(auto_plant_seeds, selected_seed)
-    end
+local selected_seed = "Carrot"
+createTextBox(1, "Seed to Plant", function(t)
+    selected_seed = tt
 end)
 createDivider(1)
 createToggle("Distance Check", 1, false, function(s)
@@ -219,100 +212,37 @@ end)
 
 -- PLAYER TAB
 createTab("Player", 2)
-createToggle("Auto Sell", 2, false, function(s)
-    if s == true then
-	    sell_fruit()
-	else
-	createNotify("Auto Sell:", "Auto Sell has been disabled.")
+local seeds = {
+    "Carrot", "Strawberry", "Blueberry", "Rose",
+    "Orange Tulip", "Stonebite", "Tomato", "Daffodil"
+}
+
+local autoBuyStates = {}
+local customSeedNames = {}
+
+for _, seed in ipairs(seeds) do
+    autoBuyStates[seed] = false
+    customSeedNames[seed] = seed
+
+createToggle("Auto-Buy " .. seed, 2, false, function(s)
+        autoBuyStates[seed] = s
+        if s then
+            ReplicatedStorage.GameEvents.BuySeedStock:FireServer(customSeedNames[seed])
+        else
+    createNotify("Auto-Buy:", seed .. " disabled.")
+    end
 end)
-createDivider(2)
-createToggle("Auto-Buy Carrot", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Carrot"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Carrot has been disabled.")
-	end
-end)
-createDivider(2)
-createToggle("Auto-Buy Strawberry", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Strawberry"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Strawberry has been disabled.")
-	end
-end)
-createDivider(2)
-createToggle("Auto-Buy Blueberry", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Blueberry"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Blueberry has been disabled.")
-	end
-end)
-createDivider(2)
-createToggle("Auto-Buy Rose", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Rose"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Rose has been disabled.")
-	end
-end)
-createDivider(2)
-createToggle("Auto-Buy OrangeTulip", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Orange Tulip"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Tulip has been disabled.")
-	end
-end)
-createDivider(2)
-createToggle("Auto-Buy Stonebite", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Stonebite"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Stone Bite has been disabled.")
-	end
-end)
-createDivider(2)
-createToggle("Auto Buy Tomato", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Tomato"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Tomato has been disabled.")
-	end
-end)
-createDivider(2)
-createToggle("Auto Buy Daffodil", 2, false, function(s)
-	if s == true then
-		local args = {
-			"Daffodil"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(args))
-	else
-		createNotify("Auto-Buy:", "Auto Buy Daffodil has been disabled.")
-	end
-end)
+
+createTextBox(2, "Seed Name: " .. seed, function(t)
+        if t and t ~= "" then
+            customSeedNames[seed] = t
+            if autoBuyStates[seed] then
+                ReplicatedStorage.GameEvents.BuySeedStock:FireServer(t)
+                createNotify("Auto-Buy:", "Now buying: " .. t)
+            end
+        end
+    end)
+end
 
 -- Settings
 createSettingButton("Rejoin", function()

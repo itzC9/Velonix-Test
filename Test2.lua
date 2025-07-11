@@ -156,7 +156,7 @@ function removeESP()
 	table.clear(espObjects)
 end
 
-function AutoComboOFF()
+function AutoCombo()
     comboActive = true
     comboConnection = game:GetService("RunService").Heartbeat:Connect(function()
         local target = getClosestTarget()
@@ -199,8 +199,35 @@ function antideathOFF()
     if dashConnection then dashConnection:Disconnect() end
 end
 
-createWindow("Velonix-Universal", 28)
-addLogo(12345678)
+function AutoBlockOn()
+    if autoBlockActive then return end
+    autoBlockActive = true
+
+    blockConnection = RunService.Heartbeat:Connect(function()
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local enemyHRP = player.Character:FindFirstChild("HumanoidRootPart")
+                local myHRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if enemyHRP and myHRP then
+                    local distance = (enemyHRP.Position - myHRP.Position).Magnitude
+                    if distance <= 12 then
+                        keypress(Enum.KeyCode.F)
+                        wait(0.2)
+                        keyrelease(Enum.KeyCode.F)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+function AutoBlockOff()
+    autoBlockActive = false
+    if blockConnection then blockConnection:Disconnect() blockConnection = nil end
+end
+
+createWindow("Velonix-TSB", 28)
+addLogo(121332021347640)
 
 createTab("Home", 1)
 createLabel("Credits:", "Founder: itzC9\nScripter: GoodgamerYT", 1)
@@ -211,6 +238,13 @@ createToggle("Auto-Combo", 2, false, function(s)
         AutoCombo()
     else
         AutoComboOFF()
+    end
+end)
+createToggle("Auto Block", 2, false, function(s)
+    if s then
+        AutoBlockOn()
+    else
+        AutoBlockOff()
     end
 end)
 createToggle("Anti-Death", 2, false, function(s)
