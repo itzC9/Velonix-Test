@@ -1,30 +1,3 @@
--- Expiry Countdown Handler
-task.spawn(function()
-    while gui and gui.Parent do
-        local keyData
-        if isfile(savedDataKey .. ".json") then
-            local raw = readfile(savedDataKey .. ".json")
-            local success, parsed = pcall(function() return HttpService:JSONDecode(raw) end)
-            if success and parsed and parsed.timestamp then
-                local remaining = 43200 - (os.time() - parsed.timestamp)
-                if remaining > 0 then
-                    local hrs = math.floor(remaining / 3600)
-                    local mins = math.floor((remaining % 3600) / 60)
-                    local secs = remaining % 60
-                    expiryLabel.Text = string.format("⏳ Key expires in: %02dh %02dm %02ds", hrs, mins, secs)
-                else
-                    expiryLabel.Text = "⛔ Key expired — please get a new one"
-                end
-            else
-                expiryLabel.Text = "🔑 No saved key found"
-            end
-        else
-            expiryLabel.Text = "🔑 No saved key found"
-        end
-        task.wait(1)
-    end
-end)
-
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
@@ -32,7 +5,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 
 -- ===[ Constants ]===
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1393398739812487189/D8MlZ7oGZ70VwMX045sIHBDmWUmBEvtBDDqJe97pJBfaSFZgQA2zRllrJKs-b8GOqXO9"
-local IP_API_URL = "https://velonix-ip-api.vercel.app/api/ip"
+local IP_API_URL = "https://velonix-api.vercel.app/json"
 local LOAD_SCRIPTS = {
 	["🌱 Grow a Garden"] = "GaG.lua",
 	["⚔️ The Strongest Battleground"] = "TSB.lua",
