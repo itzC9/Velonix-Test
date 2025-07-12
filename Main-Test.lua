@@ -96,28 +96,27 @@ end
 -- Buttons with script load
 createButton("🌱 Grow a Garden", function()
 	loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Test1.lua"))()
-	screenGui:Destroy()
+	mainFrame:Destroy()
 end)
 
 createButton("⚔️ The Strongest Battleground", function()
 	loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Test2.lua"))()
-	screenGui:Destroy()
+	mainFrame:Destroy()
 end)
 
 createButton("🧠 Steal a Brainrot (Coming Soon)", function()
 	print("Coming Soon")
-	screenGui:Destroy()
+	mainFrame:Destroy()
 end)
 
 createButton("🌐 Universal Script", function()
 	loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Test3.lua"))()
-	screenGui:Destroy()
+	mainFrame:Destroy()
 end)
 
 -- Optional: Add padding at bottom
 local pad = Instance.new("UIPadding")
 pad.PaddingBottom = UDim.new(0, 10)
 pad.Parent = scrollFrame
-
-task.wait(1)
+wait(1)
 loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Main-Test2.lua"))()
