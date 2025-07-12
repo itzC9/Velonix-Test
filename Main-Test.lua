@@ -118,5 +118,3 @@ end)
 local pad = Instance.new("UIPadding")
 pad.PaddingBottom = UDim.new(0, 10)
 pad.Parent = scrollFrame
-wait(1)
-loadstring(game:HttpGet("https://github.com/ug32-C9/Velonix-Test/raw/refs/heads/main/Main-Test2.lua"))()
